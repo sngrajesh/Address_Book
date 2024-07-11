@@ -87,7 +87,13 @@ class AddressBook (Utility):
                 contact[key] = self.input_numeric(key, value["min"], value["max"] , False)
         self.contacts.append(contact)
         print("Contact added successfully")
-        
+    
+    def add_contact_multiple(self):
+        numer_of_contacts = Utility.input_numeric("number_of_contacts", 1, 100, False)
+        for i in range(numer_of_contacts):
+            print(f"Enter Contact Detail for user {i + 1}")
+            self.add_contact()
+    
     def display_contacts(self):
         for contact in self.contacts:
             print("\n")
@@ -127,18 +133,21 @@ def main():
     address_book = AddressBook()
     while True:
         print("1. Add Contact")
-        print("2. Display Contacts")
-        print("3. Edit Contact using Name")
-        print("4. Delete Contact using Name")
+        print("2. Add Multiple Contact")
+        print("3. Display Contacts")
+        print("4. Edit Contact using Name")
+        print("5. Delete Contact using Name")
         print("_. Exit")
         choice = Utility.input_numeric("choice", 1, 4 , False)
         if choice == 1:
             address_book.add_contact()
-        elif choice == 2:
-            address_book.display_contacts()
+        if choice == 2:
+            address_book.add_contact_multiple()
         elif choice == 3:
-            address_book.edit_contact_using_name()
+            address_book.display_contacts()
         elif choice == 4:
+            address_book.edit_contact_using_name()
+        elif choice == 5:
             address_book.delete_contact_using_name()
         else:
             break
