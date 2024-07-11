@@ -2,6 +2,8 @@
 # Ability to add a new Contact to Address Book
 # Ability to edit existing contact person using their name
 # Ability to delete a person using person's name - Use Console to delete a person
+# Ability to add multiple person to Address Book
+# Refactor to add multiple Address Book to the System. Each Address Book has a unique Name
 
 class Utility:
     @staticmethod
@@ -128,30 +130,75 @@ class AddressBook (Utility):
                 print("Contact deleted successfully")
                 return
         print("Contact not found")
+        
 
-def main():
-    address_book = AddressBook()
-    while True:
-        print("1. Add Contact")
-        print("2. Add Multiple Contact")
-        print("3. Display Contacts")
-        print("4. Edit Contact using Name")
-        print("5. Delete Contact using Name")
-        print("_. Exit")
-        choice = Utility.input_numeric("choice", 1, 4 , False)
-        if choice == 1:
-            address_book.add_contact()
-        if choice == 2:
-            address_book.add_contact_multiple()
-        elif choice == 3:
-            address_book.display_contacts()
-        elif choice == 4:
-            address_book.edit_contact_using_name()
-        elif choice == 5:
-            address_book.delete_contact_using_name()
-        else:
+class AddressBookSystem(Utility):
+    def __init__(self):
+        self.address_books = []
+        
+    def add_address_book(self):
+        while True:
+            book_name = self.input_string("book_name", 2, 20, False)
+            for book in self.address_books:
+                if book["book_name"] == book_name:
+                    print("Address Book already exists")
+                    continue
+            address_book = AddressBook()
+            self.address_books.append({
+                "book_name" : book_name,
+                "address_book" : address_book
+            })
+            print("Address Book added successfully")
             break
     
+    def display_address_books(self):
+        for book in self.address_books:
+            print(book["book_name"])
+    
+    def actions_on_address_book(self):
+        book_name = self.input_string("book_name", 2, 20, False)
+        for book in self.address_books:
+            if book["book_name"] == book_name:
+                address_book = book["address_book"]
+                while True:
+                    print("1. Add Contact")
+                    print("2. Add Multiple Contact")
+                    print("3. Display Contacts")
+                    print("4. Edit Contact using Name")
+                    print("5. Delete Contact using Name")
+                    print("_. Exit")
+                    choice = Utility.input_numeric("choice", 1, 9, False)
+                    if choice == 1:
+                        address_book.add_contact()
+                    if choice == 2:
+                        address_book.add_contact_multiple()
+                    elif choice == 3:
+                        address_book.display_contacts()
+                    elif choice == 4:
+                        address_book.edit_contact_using_name()
+                    elif choice == 5:
+                        address_book.delete_contact_using_name()
+                    else:
+                        break
+                return
+        
+
+def main():
+    address_book_system = AddressBookSystem()
+    while True:
+        print("1. Add Address Book")
+        print("2. Display Address Books")
+        print("3. Perform Actions on Address Book")
+        print("_. Exit")
+        choice = Utility.input_numeric("choice", 1, 3 , False)
+        if choice == 1:
+            address_book_system.add_address_book()
+        elif choice == 2:
+            address_book_system.display_address_books()
+        elif choice == 3:
+            address_book_system.actions_on_address_book()
+        else:
+            break
     
 if __name__ == "__main__":
     main()
