@@ -1,6 +1,7 @@
 # Ability to create a Contacts in Address Book with first and last names, address, city, state, zip, phone number and email
-#Ability to add a new Contact to Address Book
-#Ability to edit existing contact person using their name
+# Ability to add a new Contact to Address Book
+# Ability to edit existing contact person using their name
+# Ability to delete a person using person's name - Use Console to delete a person
 
 class Utility:
     @staticmethod
@@ -111,6 +112,16 @@ class AddressBook (Utility):
                             contact[key] = val
                 print("Contact updated successfully")
                 return
+    
+    def delete_contact_using_name(self):
+        first_name = self.input_string("first_name", 2, 20 , False)
+        last_name = self.input_string("last_name", 2, 20, False)
+        for contact in self.contacts:
+            if contact["first_name"] == first_name and contact["last_name"] == last_name:
+                self.contacts.remove(contact)
+                print("Contact deleted successfully")
+                return
+        print("Contact not found")
 
 def main():
     address_book = AddressBook()
@@ -118,6 +129,7 @@ def main():
         print("1. Add Contact")
         print("2. Display Contacts")
         print("3. Edit Contact using Name")
+        print("4. Delete Contact using Name")
         print("_. Exit")
         choice = Utility.input_numeric("choice", 1, 4 , False)
         if choice == 1:
@@ -126,6 +138,8 @@ def main():
             address_book.display_contacts()
         elif choice == 3:
             address_book.edit_contact_using_name()
+        elif choice == 4:
+            address_book.delete_contact_using_name()
         else:
             break
     
