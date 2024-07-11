@@ -4,7 +4,8 @@
 # Ability to delete a person using person's name - Use Console to delete a person
 # Ability to add multiple person to Address Book
 # Refactor to add multiple Address Book to the System. Each Address Book has a unique Name
-# Ability to ensure there is no Duplicate Entry of the same Person in a particular Address Book
+# Ability to ensure there is no Duplicate Entry of the same Person in a particular Address Book 
+# Ability to search Person in a City or State across the multiple Address Book - Search Result
 
 class Utility:
     @staticmethod
@@ -188,7 +189,17 @@ class AddressBookSystem(Utility):
                     else:
                         break
                 return
-        
+    
+    def search_using_city(self):
+        res_contact = []
+        city_name = self.input_string("city", 2, 20, False)
+        for book in self.address_books:
+            address_book = book["address_book"]
+            for contact in address_book.contacts:  # Access the contacts list
+                if contact["city"] == city_name:
+                    res_contact.append(contact)
+        print(res_contact)
+                    
 
 def main():
     address_book_system = AddressBookSystem()
@@ -196,14 +207,17 @@ def main():
         print("1. Add Address Book")
         print("2. Display Address Books")
         print("3. Perform Actions on Address Book")
+        print("4. Search using city")
         print("_. Exit")
-        choice = Utility.input_numeric("choice", 1, 3 , False)
+        choice = Utility.input_numeric("choice", 1, 9 , False)
         if choice == 1:
             address_book_system.add_address_book()
         elif choice == 2:
             address_book_system.display_address_books()
         elif choice == 3:
             address_book_system.actions_on_address_book()
+        elif choice == 4:
+            address_book_system.search_using_city()
         else:
             break
     
