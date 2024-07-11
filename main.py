@@ -4,6 +4,7 @@
 # Ability to delete a person using person's name - Use Console to delete a person
 # Ability to add multiple person to Address Book
 # Refactor to add multiple Address Book to the System. Each Address Book has a unique Name
+# Ability to ensure there is no Duplicate Entry of the same Person in a particular Address Book
 
 class Utility:
     @staticmethod
@@ -87,6 +88,12 @@ class AddressBook (Utility):
                 contact[key] = self.input_string(key, value["min"], value["max"], False)
             else:
                 contact[key] = self.input_numeric(key, value["min"], value["max"] , False)
+        
+        for con in self.contacts:
+            if con["first_name"] == contact["first_name"] and con["last_name"] == contact["last_name"]:
+                print("Contact already exists")
+                return
+
         self.contacts.append(contact)
         print("Contact added successfully")
     
