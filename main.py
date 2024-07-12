@@ -9,6 +9,8 @@
 # Ability to view Persons by City or State - Maintain Dictionary of City and Person as well as State and Person
 # Ability to get number of contact persons i.e. count by City or State
 
+
+
 class Utility:
     @staticmethod
     def input_numeric(text : str, min : int, max : int, is_null_valid : bool) -> int:
