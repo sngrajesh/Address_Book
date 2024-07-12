@@ -7,7 +7,7 @@
 # Ability to ensure there is no Duplicate Entry of the same Person in a particular Address Book 
 # Ability to search Person in a City or State across the multiple Address Book - Search Result
 # Ability to view Persons by City or State - Maintain Dictionary of City and Person as well as State and Person
-
+# Ability to get number of contact persons i.e. count by City or State
 
 class Utility:
     @staticmethod
@@ -197,67 +197,66 @@ class AddressBookSystem(Utility):
         city_name = self.input_string("city", 2, 20, False)
         for book in self.address_books:
             address_book = book["address_book"]
-            for contact in address_book.contacts:  # Access the contacts list
+            for contact in address_book.contacts:
                 if contact["city"] == city_name:
                     res_contact.append(contact)
         print(res_contact)
-        
     
-    def view_by_city_ans_state(self):
+    def categorize_by_city_and_state(self):
         city_dict = {}
         state_dict = {}
         for book in self.address_books:
             address_book = book["address_book"]
             for contact in address_book.contacts:
-                if contact["city"] in city_dict:
-                    city_dict[contact["city"]].append({
-                        "book_name" : book["book_name"],
-                        "first_name" : contact["first_name"],
-                        "last_name" : contact["last_name"]
-                    })
-                else:
-                    city_dict[contact["city"]] = [{
-                        "book_name" : book["book_name"],
-                        "first_name" : contact["first_name"],
-                        "last_name" : contact["last_name"]
-                    
-                    }]
-                if contact["state"] in state_dict:
-                    state_dict[contact["state"]].append({
-                        "book_name" : book["book_name"],
-                        "first_name" : contact["first_name"],
-                        "last_name" : contact["last_name"]
-                    })
-                else:
-                    state_dict[contact["state"]] = [{
-                        "book_name" : book["book_name"],
-                        "first_name" : contact["first_name"],
-                        "last_name" : contact["last_name"]
-                    }]
+                # City categorization
+                if contact["city"] not in city_dict:
+                    city_dict[contact["city"]] = []
+                city_dict[contact["city"]].append({
+                    "first_name": contact["first_name"],
+                    "last_name": contact["last_name"],
+                    "address_book_name": book["book_name"]
+                })
+                
+                # State categorization
+                if contact["state"] not in state_dict:
+                    state_dict[contact["state"]] = []
+                state_dict[contact["state"]].append({
+                    "first_name": contact["first_name"],
+                    "last_name": contact["last_name"],
+                    "address_book_name": book["book_name"]
+                })
+        return city_dict, state_dict
+
+    def view_by_city_and_state(self):
+        city_dict, state_dict = self.categorize_by_city_and_state()
         
-        print("\n\n\nPerson according to city")
-        for key , value in city_dict.items():
-            print(f'\n{key}')
-            for con in value:
-                print(64*"-")
-                print("|" , end="")
-                for key_con, val_con in con.items():
-                    print(f'{val_con:^20}',end="|")
-                print()
-            print(64*"-", end = "\n")
-            
-
-        print("\n\n\nPerson according to state")
-        for key , value in state_dict.items():
-            print(f'\n{key}')
-            for con in value:
-                print(64*"-")
-                print("|" , end="")
-                for key_con, val_con in con.items():
-                    print(f'{val_con:^20}',end="|")
-                print()
-            print(64*"-", end = "\n")
-
+        print("\n\nPersons according to city")
+        for city, contacts in city_dict.items():
+            print(f'\n{city}')
+            print(64*"-")
+            print("|{:^20}|{:^20}|{:^20}|".format("First Name", "Last Name", "Address Book"))
+            print(64*"-")
+            for contact in contacts:
+                print("|{:^20}|{:^20}|{:^20}|".format(
+                    contact["first_name"],
+                    contact["last_name"],
+                    contact["address_book_name"]
+                ))
+            print(64*"-")
+        
+        print("\n\nPersons according to state")
+        for state, contacts in state_dict.items():
+            print(f'\n{state}')
+            print(64*"-")
+            print("|{:^20}|{:^20}|{:^20}|".format("First Name", "Last Name", "Address Book"))
+            print(64*"-")
+            for contact in contacts:
+                print("|{:^20}|{:^20}|{:^20}|".format(
+                    contact["first_name"],
+                    contact["last_name"],
+                    contact["address_book_name"]
+                ))
+            print(64*"-")
 
 def main():
     address_book_system = AddressBookSystem()
@@ -266,6 +265,7 @@ def main():
         print("2. Display Address Books")
         print("3. Perform Actions on Address Book")
         print("4. Search using city")
+        print("5. Categorise by city and state")
         print("_. Exit")
         choice = Utility.input_numeric("choice", 1, 9 , False)
         if choice == 1:
