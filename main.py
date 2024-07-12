@@ -10,8 +10,9 @@
 # Ability to get number of contact persons i.e. count by City or State
 # Ability to sort the entries in the address book alphabetically by Person’s name
 # Ability to sort the entries in the address book alphabetically by City, State and Zip Code
+# Ability to Read or Write the Address Book with Persons Contact into a File using File IO
 
-
+import os
 import copy 
 
 class Utility:
@@ -319,8 +320,46 @@ class AddressBookSystem(Utility):
             address_book = book["address_book"]
             address_book.contacts.sort(key=lambda x: x[KEY[user_choice-1]])
         self.print_address_book_in_format(sorted_book)
-
-
+        
+    def write_to_file(self):
+        with open("address_book.txt", "w") as file:
+            for book in self.address_books:
+                file.write(f"Address_Book_Name: {book['book_name']}\n")
+                for contact in book["address_book"].contacts:
+                    for key, value in contact.items():
+                        file.write(f"{key}: {value}\n")
+                    file.write("\n")
+                file.write("\n")
+            
+    def read_from_file(self):
+        if not os.path.exists("address_book.txt"):
+            print("File does not exist")
+            return
+        with open("address_book.txt", "r") as file:
+            lines = file.readlines()
+            address_book = None
+            current_contact = {}
+            for line in lines:
+                line = line.strip()
+                if line.startswith("Address_Book_Name:"):
+                    book_name = line.split(":")[1].strip()
+                    address_book = AddressBook()
+                    self.address_books.append({
+                        "book_name": book_name,
+                        "address_book": address_book
+                    })
+                elif line == "":
+                    if current_contact:
+                        address_book.contacts.append(current_contact)
+                        current_contact = {}
+                elif ":" in line:
+                    key, value = line.split(":", 1)
+                    current_contact[key.strip()] = value.strip()            
+            # Add the last contact if there is one
+            if current_contact:
+                address_book.contacts.append(current_contact)
+        print("File read successfully")
+        
 def main():
     address_book_system = AddressBookSystem()
     while True:
@@ -333,8 +372,10 @@ def main():
         print("7. Display address book in format")
         print("8. Sort by name")
         print("9. Sort by city, state and zip code")
+        print("10. Write to file")
+        print("11. Read from file")
         print("_. Exit")
-        choice = Utility.input_numeric("choice", 1, 9 , False)
+        choice = Utility.input_numeric("choice", 1, 11 , False)
         if choice == 1:
             address_book_system.add_address_book()
         elif choice == 2:
@@ -353,6 +394,10 @@ def main():
             address_book_system.sort_by_name()
         elif choice == 9:
             address_book_system.sort_by_city_state_zip()
+        elif choice == 10:
+            address_book_system.write_to_file()
+        elif choice == 11:
+            address_book_system.read_from_file()
         else:
             break
             
