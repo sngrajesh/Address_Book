@@ -13,6 +13,7 @@
 # Ability to Read or Write the Address Book with Persons Contact into a File using File IO
 
 import os
+import csv
 import copy 
 
 class Utility:
@@ -321,45 +322,46 @@ class AddressBookSystem(Utility):
             address_book.contacts.sort(key=lambda x: x[KEY[user_choice-1]])
         self.print_address_book_in_format(sorted_book)
         
+
     def write_to_file(self):
-        with open("address_book.txt", "w") as file:
+        with open("address_book.csv", "w", newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Address_Book_Name"] + list(AddressBook.PERSON_CONSTRAINTS.keys()))
             for book in self.address_books:
-                file.write(f"Address_Book_Name: {book['book_name']}\n")
                 for contact in book["address_book"].contacts:
-                    for key, value in contact.items():
-                        file.write(f"{key}: {value}\n")
-                    file.write("\n")
-                file.write("\n")
-            
+                    row = [book["book_name"]]
+                    row.extend([contact.get(key, "") for key in AddressBook.PERSON_CONSTRAINTS.keys()])
+                    writer.writerow(row)
+        print("Data written to address_book.csv successfully")
+        
+        
     def read_from_file(self):
-        if not os.path.exists("address_book.txt"):
+        if not os.path.exists("address_book.csv"):
             print("File does not exist")
             return
-        with open("address_book.txt", "r") as file:
-            lines = file.readlines()
-            address_book = None
-            current_contact = {}
-            for line in lines:
-                line = line.strip()
-                if line.startswith("Address_Book_Name:"):
-                    book_name = line.split(":")[1].strip()
-                    address_book = AddressBook()
+
+        with open("address_book.csv", "r", newline='') as file:
+            reader = csv.reader(file) # Create a csv reader object for reading the file
+            headers = next(reader)  # Read the header row
+            current_book_name = None
+            current_address_book = None
+            for row in reader:
+                book_name = row[0]
+                if book_name != current_book_name:
+                    current_book_name = book_name
+                    current_address_book = AddressBook()
                     self.address_books.append({
                         "book_name": book_name,
-                        "address_book": address_book
+                        "address_book": current_address_book
                     })
-                elif line == "":
-                    if current_contact:
-                        address_book.contacts.append(current_contact)
-                        current_contact = {}
-                elif ":" in line:
-                    key, value = line.split(":", 1)
-                    current_contact[key.strip()] = value.strip()            
-            # Add the last contact if there is one
-            if current_contact:
-                address_book.contacts.append(current_contact)
-        print("File read successfully")
+                contact = {}
+                for i, key in enumerate(headers[1:], 1):  # Skip the Address_Book_Name column
+                    contact[key] = row[i]
+                current_address_book.contacts.append(contact)
+        print("Data read from address_book.csv successfully")
         
+        
+                
 def main():
     address_book_system = AddressBookSystem()
     while True:
