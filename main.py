@@ -8,6 +8,10 @@
 # Ability to search Person in a City or State across the multiple Address Book - Search Result
 # Ability to view Persons by City or State - Maintain Dictionary of City and Person as well as State and Person
 # Ability to get number of contact persons i.e. count by City or State
+# Ability to sort the entries in the address book alphabetically by Person’s name
+
+
+import copy 
 
 class Utility:
     @staticmethod
@@ -164,7 +168,31 @@ class AddressBookSystem(Utility):
     def display_address_books(self):
         for book in self.address_books:
             print(book["book_name"])
+
+    @staticmethod
+    def print_address_book_in_format(address_books):   
+        for book in address_books:
+            print(f"\nAddress Book: {book['book_name']}")
+            print('-'*169)
+            print("|", end = "")
+            for key, value in AddressBook.PERSON_CONSTRAINTS.items():
+                print(f'{key:^20}', end = "|")
+            print()
+            print('-'*169)
+            for contact  in book["address_book"].contacts:
+                print("|", end = "")
+                for value in contact.values():
+                    print(f'{value:^20}', end = "|")
+                print()
+            print('-'*169)
+            print()
     
+
+    def display_address_books_in_format(self):
+        self.print_address_book_in_format(self.address_books)
+
+
+
     def actions_on_address_book(self):
         book_name = self.input_string("book_name", 2, 20, False)
         for book in self.address_books:
@@ -257,6 +285,27 @@ class AddressBookSystem(Utility):
                     contact["address_book_name"]
                 ))
             print(64*"-")
+    
+
+    def view_number_of_contact_by_city_and_state(self):
+        city_dict, state_dict = self.categorize_by_city_and_state()
+        print("\n\nNumber of contacts according to city")
+        for city, contacts in city_dict.items():
+            print(f'{city} : {len(contacts)}')
+        print("\n\nNumber of contacts according to state")
+        for state, contacts in state_dict.items():
+            print(f'{state} : {len(contacts)}')
+
+    
+    def sort_by_name(self):
+        sorted_book = copy.deepcopy(self.address_books)
+        #sorting by first_name last_name
+        for book in sorted_book:
+            address_book = book["address_book"]
+            address_book.contacts.sort(key=lambda x: x["last_name"])
+            address_book.contacts.sort(key=lambda x: x["first_name"])
+        self.print_address_book_in_format(sorted_book)
+
 
 def main():
     address_book_system = AddressBookSystem()
@@ -266,6 +315,9 @@ def main():
         print("3. Perform Actions on Address Book")
         print("4. Search using city")
         print("5. Categorise by city and state")
+        print("6. View number of contact by city and state")
+        print("7. Display address book in format")
+        print("8. Sort by name")
         print("_. Exit")
         choice = Utility.input_numeric("choice", 1, 9 , False)
         if choice == 1:
@@ -278,6 +330,12 @@ def main():
             address_book_system.search_using_city()
         elif choice == 5:
             address_book_system.view_by_city_ans_state()
+        elif choice == 6:
+            address_book_system.view_number_of_contact_by_city_and_state()
+        elif choice == 7:
+            address_book_system.display_address_books_in_format()
+        elif choice == 8:
+            address_book_system.sort_by_name()
         else:
             break
     
