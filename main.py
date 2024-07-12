@@ -6,6 +6,8 @@
 # Refactor to add multiple Address Book to the System. Each Address Book has a unique Name
 # Ability to ensure there is no Duplicate Entry of the same Person in a particular Address Book 
 # Ability to search Person in a City or State across the multiple Address Book - Search Result
+# Ability to view Persons by City or State - Maintain Dictionary of City and Person as well as State and Person
+
 
 class Utility:
     @staticmethod
@@ -74,7 +76,7 @@ class AddressBook (Utility):
         },
         "email" : {
             "min" : 5,
-            "max" : 50,
+            "max" : 20,
             "type" : "str"
         }
     }
@@ -199,7 +201,63 @@ class AddressBookSystem(Utility):
                 if contact["city"] == city_name:
                     res_contact.append(contact)
         print(res_contact)
+        
+    
+    def view_by_city_ans_state(self):
+        city_dict = {}
+        state_dict = {}
+        for book in self.address_books:
+            address_book = book["address_book"]
+            for contact in address_book.contacts:
+                if contact["city"] in city_dict:
+                    city_dict[contact["city"]].append({
+                        "book_name" : book["book_name"],
+                        "first_name" : contact["first_name"],
+                        "last_name" : contact["last_name"]
+                    })
+                else:
+                    city_dict[contact["city"]] = [{
+                        "book_name" : book["book_name"],
+                        "first_name" : contact["first_name"],
+                        "last_name" : contact["last_name"]
                     
+                    }]
+                if contact["state"] in state_dict:
+                    state_dict[contact["state"]].append({
+                        "book_name" : book["book_name"],
+                        "first_name" : contact["first_name"],
+                        "last_name" : contact["last_name"]
+                    })
+                else:
+                    state_dict[contact["state"]] = [{
+                        "book_name" : book["book_name"],
+                        "first_name" : contact["first_name"],
+                        "last_name" : contact["last_name"]
+                    }]
+        
+        print("\n\n\nPerson according to city")
+        for key , value in city_dict.items():
+            print(f'\n{key}')
+            for con in value:
+                print(64*"-")
+                print("|" , end="")
+                for key_con, val_con in con.items():
+                    print(f'{val_con:^20}',end="|")
+                print()
+            print(64*"-", end = "\n")
+            
+
+        print("\n\n\nPerson according to state")
+        for key , value in state_dict.items():
+            print(f'\n{key}')
+            for con in value:
+                print(64*"-")
+                print("|" , end="")
+                for key_con, val_con in con.items():
+                    print(f'{val_con:^20}',end="|")
+                print()
+            print(64*"-", end = "\n")
+
 
 def main():
     address_book_system = AddressBookSystem()
@@ -218,8 +276,11 @@ def main():
             address_book_system.actions_on_address_book()
         elif choice == 4:
             address_book_system.search_using_city()
+        elif choice == 5:
+            address_book_system.view_by_city_ans_state()
         else:
             break
     
 if __name__ == "__main__":
     main()
+    
