@@ -9,6 +9,7 @@
 # Ability to view Persons by City or State - Maintain Dictionary of City and Person as well as State and Person
 # Ability to get number of contact persons i.e. count by City or State
 # Ability to sort the entries in the address book alphabetically by Person’s name
+# Ability to sort the entries in the address book alphabetically by City, State and Zip Code
 
 
 import copy 
@@ -307,6 +308,19 @@ class AddressBookSystem(Utility):
         self.print_address_book_in_format(sorted_book)
 
 
+    def sort_by_city_state_zip(self):
+        KEY = ["city", "state", "zip_code"]
+        print("Choose the key by which you want to sort")
+        for i, key in enumerate(KEY):
+            print(f"{i+1}. {key.replace('_', ' ').title()}")
+        user_choice = Utility.input_numeric("choice", 1, 3, False)
+        sorted_book = copy.deepcopy(self.address_books)
+        for book in sorted_book:
+            address_book = book["address_book"]
+            address_book.contacts.sort(key=lambda x: x[KEY[user_choice-1]])
+        self.print_address_book_in_format(sorted_book)
+
+
 def main():
     address_book_system = AddressBookSystem()
     while True:
@@ -318,6 +332,7 @@ def main():
         print("6. View number of contact by city and state")
         print("7. Display address book in format")
         print("8. Sort by name")
+        print("9. Sort by city, state and zip code")
         print("_. Exit")
         choice = Utility.input_numeric("choice", 1, 9 , False)
         if choice == 1:
@@ -336,6 +351,8 @@ def main():
             address_book_system.display_address_books_in_format()
         elif choice == 8:
             address_book_system.sort_by_name()
+        elif choice == 9:
+            address_book_system.sort_by_city_state_zip()
         else:
             break
             
