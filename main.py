@@ -13,7 +13,7 @@
 # Ability to Read or Write the Address Book with Persons Contact into a File using File IO
 
 import os
-import csv
+import json
 import copy 
 
 class Utility:
@@ -324,42 +324,37 @@ class AddressBookSystem(Utility):
         
 
     def write_to_file(self):
-        with open("address_book.csv", "w", newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Address_Book_Name"] + list(AddressBook.PERSON_CONSTRAINTS.keys()))
-            for book in self.address_books:
-                for contact in book["address_book"].contacts:
-                    row = [book["book_name"]]
-                    row.extend([contact.get(key, "") for key in AddressBook.PERSON_CONSTRAINTS.keys()])
-                    writer.writerow(row)
-        print("Data written to address_book.csv successfully")
+        data = []
+        for book in self.address_books:
+            book_data = {
+                "book_name": book["book_name"],
+                "contacts": book["address_book"].contacts
+            }
+            data.append(book_data)
         
+        with open("address_book.json", "w") as file:
+            json.dump(data, file, indent=4)
         
+        print("Data written to address_book.json successfully")
+
     def read_from_file(self):
-        if not os.path.exists("address_book.csv"):
+        if not os.path.exists("address_book.json"):
             print("File does not exist")
             return
 
-        with open("address_book.csv", "r", newline='') as file:
-            reader = csv.reader(file) # Create a csv reader object for reading the file
-            headers = next(reader)  # Read the header row
-            current_book_name = None
-            current_address_book = None
-            for row in reader:
-                book_name = row[0]
-                if book_name != current_book_name:
-                    current_book_name = book_name
-                    current_address_book = AddressBook()
-                    self.address_books.append({
-                        "book_name": book_name,
-                        "address_book": current_address_book
-                    })
-                contact = {}
-                for i, key in enumerate(headers[1:], 1):  # Skip the Address_Book_Name column
-                    contact[key] = row[i]
-                current_address_book.contacts.append(contact)
-        print("Data read from address_book.csv successfully")
+        with open("address_book.json", "r") as file:
+            data = json.load(file)
         
+        self.address_books = []
+        for book_data in data:
+            address_book = AddressBook()
+            address_book.contacts = book_data["contacts"]
+            self.address_books.append({
+                "book_name": book_data["book_name"],
+                "address_book": address_book
+            })
+        
+        print("Data read from address_book.json successfully")    
         
                 
 def main():
